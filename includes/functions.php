@@ -85,9 +85,9 @@ function fx_recaptcha_register_script() {
 		'sitekey' => esc_attr( fx_recaptcha_get_option( 'site_key' ) ),
 	) );
 }
-add_action( 'wp_enqueue_scripts', 'fx_recaptcha_register_script' );
-add_action( 'admin_enqueue_scripts', 'fx_recaptcha_register_script' );
-add_action( 'login_enqueue_scripts', 'fx_recaptcha_register_script' );
+add_action( 'wp_enqueue_scripts', 'fx_recaptcha_register_script', 1 );
+add_action( 'admin_enqueue_scripts', 'fx_recaptcha_register_script', 1 );
+add_action( 'login_enqueue_scripts', 'fx_recaptcha_register_script', 1 );
 
 /**
  * Add Async and Defer to reCAPTCHA Script Tag.
@@ -110,10 +110,38 @@ add_filter( 'script_loader_tag', 'fx_recaptcha_script_tag', 10, 2 );
  * reCAPTCHA Field
  *
  * @since 1.0.0
- *
- * @param bool $echo
  */
-function fx_recaptcha_field( $echo = false ) {
+function fx_recaptcha_field() {
 	wp_enqueue_script( 'fx-recaptcha' );
 	return apply_filters( 'fx_recaptcha_field', '<div class="fx-recaptcha"></div>' );
 }
+
+/**
+ * ReLoad. Utility script to reload reCAPTCHA script.
+ *
+ * @since 1.0.0
+ */
+function fx_recaptcha_reload() {
+	ob_start();
+	?>
+	<script>
+	jQuery( '.fx-recaptcha' ).each( function(i) {
+		grecaptcha.render( jQuery( this )[0], {
+			sitekey: '<?php echo esc_attr( fx_recaptcha_get_option( 'site_key' ) ); ?>',
+		} );
+	} );
+	</script>
+	<?php
+	return apply_filters( 'fx_recaptcha_reload', ob_get_clean() );
+}
+
+
+add_action( 'register_form', function() {
+	echo fx_recaptcha_field() . fx_recaptcha_reload();
+} );
+add_action( 'woocommerce_login_form', function() {
+	echo fx_recaptcha_field() . fx_recaptcha_reload();
+} );
+add_action( 'woocommerce_register_form', function() {
+	echo fx_recaptcha_field() . fx_recaptcha_reload();
+} );
