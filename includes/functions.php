@@ -110,38 +110,44 @@ add_filter( 'script_loader_tag', 'fx_recaptcha_script_tag', 10, 2 );
  * reCAPTCHA Field
  *
  * @since 1.0.0
+ *
+ * @param bool $reload True to add reload script.
+ * @return string
  */
-function fx_recaptcha_field() {
+function fx_recaptcha_field( $reload = false ) {
 	wp_enqueue_script( 'fx-recaptcha' );
-	return apply_filters( 'fx_recaptcha_field', '<div class="fx-recaptcha"></div>' );
+	$field = '<div class="fx-recaptcha"></div>';
+	if ( $reload ) {
+		$field .= fx_recaptcha_reload_script();
+	}
+	return apply_filters( 'fx_recaptcha_field', $field, $reload );
 }
 
 /**
  * ReLoad. Utility script to reload reCAPTCHA script.
+ * Useful if the form is loaded via AJAX.
  *
  * @since 1.0.0
+ *
+ * @return string
  */
-function fx_recaptcha_reload() {
+function fx_recaptcha_reload_script() {
+	wp_enqueue_script( 'fx-recaptcha' );
 	ob_start();
 	?>
 	<script>
-	jQuery( '.fx-recaptcha' ).each( function(i) {
-		grecaptcha.render( jQuery( this )[0], {
-			sitekey: '<?php echo esc_attr( fx_recaptcha_get_option( 'site_key' ) ); ?>',
+	if ( typeof jQuery !== "undefined" ) {
+		jQuery( document ).ready( function($) {
+			jQuery( '.fx-recaptcha' ).each( function(i) {
+				if ( '' === $( this ).html() && typeof grecaptcha !== "undefined" ) {
+					grecaptcha.render( jQuery( this )[0], {
+						sitekey: '<?php echo esc_attr( fx_recaptcha_get_option( 'site_key' ) ); ?>',
+					} );
+				}
+			} );
 		} );
-	} );
+	}
 	</script>
 	<?php
-	return apply_filters( 'fx_recaptcha_reload', ob_get_clean() );
+	return apply_filters( 'fx_recaptcha_reload_script', ob_get_clean() );
 }
-
-
-add_action( 'register_form', function() {
-	echo fx_recaptcha_field() . fx_recaptcha_reload();
-} );
-add_action( 'woocommerce_login_form', function() {
-	echo fx_recaptcha_field() . fx_recaptcha_reload();
-} );
-add_action( 'woocommerce_register_form', function() {
-	echo fx_recaptcha_field() . fx_recaptcha_reload();
-} );

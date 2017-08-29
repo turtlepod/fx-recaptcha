@@ -38,7 +38,7 @@ class fx_ReCAPTCHA_WP_Login {
 	public function __construct() {
 
 		// Add field in wp-login.php
-		add_action( 'login_form', array( $this, 'login_recaptcha_field' ) );
+		add_action( 'login_form', array( $this, 'wp_login_recaptcha_field' ) );
 
 		// Add field in custom login form.
 		add_filter( 'login_form_middle', array( $this, 'custom_login_recaptcha_field' ) );
@@ -52,7 +52,7 @@ class fx_ReCAPTCHA_WP_Login {
 	 *
 	 * @since 1.0.0
 	 */
-	public function login_recaptcha_field() {
+	public function wp_login_recaptcha_field() {
 		?>
 		<style>
 			#login {
@@ -63,16 +63,18 @@ class fx_ReCAPTCHA_WP_Login {
 			}
 		</style>
 		<?php
-		echo fx_recaptcha_field();
+		echo fx_recaptcha_field( true );
 	}
 
 	/**
 	 * Custom Login reCAPTCHA Field.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @return string
 	 */
 	public function custom_login_recaptcha_field( $middle ) {
-		return $middle . fx_recaptcha_field();
+		return $middle . fx_recaptcha_field( true );
 	}
 
 	/**
