@@ -63,7 +63,7 @@ class fx_ReCAPTCHA_WP_Login {
 			}
 		</style>
 		<?php
-		echo fx_recaptcha_field( true );
+		echo fx_recaptcha_field( false );
 	}
 
 	/**
@@ -89,7 +89,7 @@ class fx_ReCAPTCHA_WP_Login {
 	public function authenticate( $user, $username, $password ) {
 		if ( isset( $_POST['g-recaptcha-response'] ) ) {
 			if ( false === fx_recaptcha_verify() ) {
-				return new WP_Error( 'denied', __( 'Captcha failed, are you robot? please try again.','fx-recaptcha' ) );
+				return new WP_Error( 'denied', __( 'Captcha failed, are you a robot? please try again.','fx-recaptcha' ) );
 			}
 		}
 		return $user;

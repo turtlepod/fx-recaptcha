@@ -114,7 +114,7 @@ add_filter( 'script_loader_tag', 'fx_recaptcha_script_tag', 10, 2 );
  * @param bool $reload True to add reload script.
  * @return string
  */
-function fx_recaptcha_field( $reload = false ) {
+function fx_recaptcha_field( $reload = true ) {
 	wp_enqueue_script( 'fx-recaptcha' );
 	$field = '<div class="fx-recaptcha"></div>';
 	if ( $reload ) {
